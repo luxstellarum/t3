@@ -1,0 +1,37 @@
+0 info it worked if it ends with ok
+1 verbose cli [ 'node', '/usr/local/bin/npm', 'link', 'iconv' ]
+2 info using npm@1.1.59
+3 info using node@v0.8.8
+4 info /Users/lux/workspace/t3/node_modules/iconv unbuild
+5 verbose read json /Users/lux/workspace/t3/node_modules/iconv/package.json
+6 verbose link symlinking /usr/local/lib/node_modules/iconv to /Users/lux/workspace/t3/node_modules/iconv
+7 info build /Users/lux/workspace/t3/node_modules/iconv
+8 verbose read json /Users/lux/workspace/t3/node_modules/iconv/package.json
+9 info preinstall iconv@1.2.4
+10 verbose linkStuff [ false, false, false, '/Users/lux/workspace/t3/node_modules' ]
+11 info linkStuff iconv@1.2.4
+12 verbose linkBins iconv@1.2.4
+13 verbose linkMans iconv@1.2.4
+14 verbose rebuildBundles iconv@1.2.4
+15 info install iconv@1.2.4
+16 verbose unsafe-perm in lifecycle true
+17 silly exec sh "-c" "node-gyp rebuild"
+18 silly sh,-c,node-gyp rebuild,/Users/lux/workspace/t3/node_modules/iconv spawning
+19 info iconv@1.2.4 Failed to exec install script
+20 error iconv@1.2.4 install: `node-gyp rebuild`
+20 error `sh "-c" "node-gyp rebuild"` failed with 1
+21 error Failed at the iconv@1.2.4 install script.
+21 error This is most likely a problem with the iconv package,
+21 error not with npm itself.
+21 error Tell the author that this fails on your system:
+21 error     node-gyp rebuild
+21 error You can get their info via:
+21 error     npm owner ls iconv
+21 error There is likely additional logging output above.
+22 error System Darwin 12.1.0
+23 error command "node" "/usr/local/bin/npm" "link" "iconv"
+24 error cwd /Users/lux/workspace/t3
+25 error node -v v0.8.8
+26 error npm -v 1.1.59
+27 error code ELIFECYCLE
+28 verbose exit [ 1, true ]
