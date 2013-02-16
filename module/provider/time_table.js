@@ -43,16 +43,19 @@ module.exports = {
 
 	,get_one : function( condition, callback ) {
 		var response = {};
-		model.findOne(condition, function(doc, err) {
-			if(!err) {
+		model.findOne(condition, function(err, doc) {
+			if(!err && doc) {
 				response['result'] = true;
+				response['data'] = new Array();
 				response['data'] = doc;
+
+				callback(response);
 			}
 			else {
 				response['result'] = false;
+				callback(response);
 			}
 
-			callback(response);// 잠정적 문제코드. (순서역전 가능성)
 		});
 	} // end of get_one
 
@@ -61,16 +64,21 @@ module.exports = {
 		
 		order_target = order_target || 'dept_time';
 
-		model.find(condition).sort(order_target).exec(function(docs, err) {
-			if(!err) {
+		console.log( 'get list, condition and order_target : ', condition, order_target);
+
+		model.find(condition).sort(order_target).exec(function(err, docs) {
+			if(!err && docs) {
 				response['result'] = true;
+				response['data'] = new Array(); 
 				response['data'] = docs;
+				callback(response);
 			}
 			else {
 				response['result'] = false;
+				callback(response);
 			}
 
-			callback(response);
+			
 		});
 	}
 }
