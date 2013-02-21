@@ -64,8 +64,6 @@ module.exports = {
 		
 		order_target = order_target || 'dept_time';
 
-		console.log( 'get list, condition and order_target : ', condition, order_target);
-
 		model.find(condition).sort(order_target).exec(function(err, docs) {
 			if(!err && docs) {
 				response['result'] = true;

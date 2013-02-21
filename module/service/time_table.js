@@ -6,6 +6,10 @@ var jsdom = require('jsdom'),
 	iconv = new Iconv('EUC-KR', 'UTF-8//TRANSLIT//IGNORE'),
 	strlib = require('../library/strlib.js');
 
+var transfer_station = new Array('경주','영천','서경주','영주','제천','민둥산','동백산','동해','봉양','천안','천안아산','오송','조치원','대전',
+								'김천','동대구','삼랑진','창원','순천','광주송정','익산');
+
+
 module.exports = {
 
 
@@ -215,13 +219,22 @@ module.exports = {
 				time_table['arrv_station'] = req.body.arrv_station;
 				time_table['time_table'] = new Array();
 				time_table['time_table'] = result;	
+				res.json( time_table );
+			}
+			//직통 경로가 없을 때
+			else{
+				self.get_transfer_time_table( req.body.dept_station, req.body.arrv_station, function( result ) { 
+					console.log('result :', result);
+					res.json(result);
+				});
 			}
 
-			res.json( time_table );
+			
 		});//end of get_time_table_station
 	}// end of show_time_table_station
 	
 	,get_time_table_station : function( dept_station, arrv_station, callback ) {
+		var self = this;
 		var condition = { 'dept_station' : dept_station };
 		var order_target = 'dept_time';
 		var time_table = new Array();
@@ -237,17 +250,21 @@ module.exports = {
 
 						time_table_db.get_one(condition, function(result){
 							if( result.result == true) {
-								var j = time_table.length
-								time_table[j] = {};
-								time_table[j]['id'] = list[m].id;
-								time_table[j]['dept_time'] = list[m].dept_time;
-								time_table[j]['arrv_time'] = result.data.arrv_time;
-								time_table[j]['type'] = result.data.type;
+								self.compare_time(list[m].dept_time, result.data.arrv_time, function(compare_result) {
+									if( compare_result == true) {
+										var j = time_table.length
+										time_table[j] = {};
+										time_table[j]['id'] = list[m].id;
+										time_table[j]['dept_time'] = list[m].dept_time;
+										time_table[j]['arrv_time'] = result.data.arrv_time;
+										time_table[j]['type'] = result.data.type;	
+									}									
+								});
 							}
 
 							if( m == list.length-1 ) {
 								callback(time_table);
-							}
+							}	
 						});
 
 					})(i);
@@ -258,5 +275,61 @@ module.exports = {
 			}
 		});
 	}// end of get_time_table_station
+
+	//환승 한 번 ! 인 경우만. 두번 이상도 있으려나?
+	,get_transfer_time_table : function( dept_station, arrv_station, callback ) {
+		var self = this;
+		var time_table = new Array();
+		var prev_time_table = new Array();
+		var post_time_table = new Array();
+		for( var i = 0; i < transfer_station.length; i++) {
+			(function(m){
+				self.get_time_table_station(dept_station, transfer_station[m], function(prev_result) {
+					prev_time_table[m] = {};
+					prev_time_table[m]['dept_station'] = dept_station;
+					prev_time_table[m]['arrv_station'] = transfer_station[m];
+					prev_time_table[m]['time_table'] = new Array();
+					prev_time_table[m]['time_table'] = prev_result;
+
+					self.get_time_table_station( transfer_station[m], arrv_station, function(post_result) {
+						post_time_table[m] = {};
+						post_time_table[m]['dept_station'] = transfer_station[m];
+						post_time_table[m]['arrv_station'] = arrv_station;
+						post_time_table[m]['time_table'] = new Array();
+						post_time_table[m]['time_table'] = post_result;	
+
+						time_table[m] = {};
+						time_table[m]['prev'] = new Array();
+						time_table[m]['post'] = new Array();
+						time_table[m]['prev'] = prev_time_table[m];
+						time_table[m]['post'] = post_time_table[m];
+
+						console.log('time table : ', time_table)
+
+						if ( m == transfer_station.length-1 ) {
+							console.log('here', time_table);
+							callback(time_table);
+						}
+					});						
+				});
+			})(i);
+		}
+	}//end of get_transfer_time_table
+
+	,compare_time : function(time1, time2, callback) {
+		var early = time1.split(':');
+		var late = time2.split(':');
+		if( time1 != "" && time2 != "") {
+			if( parseInt(early[0], 10) > parseInt(late[0], 10) ) {
+				callback(false);
+			}
+			else if( parseInt(early[1], 10) > parseInt(late[1], 10) ) {
+				callback(false);
+			}
+			else {
+				callback(true);
+			}	
+		}
+	}//end of compare time
 
 }//end of module.exports
