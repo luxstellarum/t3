@@ -64,32 +64,39 @@ module.exports = {
 							/***********************************/
 							
 							var length = $('tr[bgcolor="#FFFFFF"]').length;
-							var count = 0;
+							
 							/************출발시각 및 도착시각 따내기********************/
 							if(length == 0) {
 								self.set_time_table(train_number+1);
 							}
 							else {
-								$('tr[bgcolor="#FFFFFF"]').each(function(){
-									self.make_train_contents(this, $, function(result){
-										train_info['dept_station'] = result.dept_station;
-										train_info['arrv_station'] = result.arrv_station;
-										train_info['dept_time'] = result.dept_time;
-										train_info['arrv_time'] = result.arrv_time;
-										self.insert(train_info, function(result) {
-											if(result.result == true) {
-												(function(n){
-													if( n != (length-1) ) {
-														count++;
+								//var count = 0;
+								for ( var i=0; i<length; i++) {
+									(function(n){
+										var target = $('table[bgcolor="#CCCCCC"] tbody').find('tr')[n];
+										self.make_train_contents(target, $, function(result) {
+											self.check_transfer(result.arrv_station, function(is_transfer){
+												train_info['dept_station'] = result.dept_station;
+												train_info['arrv_station'] = result.arrv_station;
+												train_info['dept_hour'] = result.dept_hour;
+												train_info['arrv_hour'] = result.arrv_hour;
+												train_info['dept_minute'] = result.dept_minute;
+												train_info['arrv_minute'] = result.arrv_minute;
+												
+												train_info['is_transfer'] = is_transfer;
+
+												self.insert(train_info, function(result) {
+													if(result.result == true) {
+														if( n == length-1 ) {
+															console.log('here???');
+															self.set_time_table(train_number+1);						
+														}
 													}
-													else {
-														self.set_time_table(train_number+1);						
-													}
-												})(count);
-											}
-										});
-									})
-								});	
+												});	//end of insert
+											});//end of check_transfer
+										});//end of make_train_contents
+									})(i);
+								}//end of for
 							}
 							/****************************************************/
 						}
@@ -144,13 +151,23 @@ module.exports = {
 				buf = new Buffer(tmp.length);
 				buf.write(tmp, 0, tmp.length, 'binary');
 				result['arrv_station'] = iconv.convert(buf).toString();
-				result['dept_time'] = strlib.trim($(target).find('td:first').next().next().text());
-				result['arrv_time'] = strlib.trim($(target).find('td:first').parent().next().find('td:first').next().text());
+				var dept_time = (strlib.trim($(target).find('td:first').next().next().text())).split(':');
+				var arrv_time = (strlib.trim($(target).find('td:first').parent().next().find('td:first').next().text())).split(':');
+
+				result['dept_hour'] = dept_time[0];
+				result['dept_minute'] = dept_time[1];
+
+				result['arrv_hour'] = arrv_time[0];
+				result['arrv_minute'] = arrv_time[1];
+
 			}
 			else {
 				result['arrv_station'] = "";
-				result['arrv_time'] = "";
-				result['dept_time'] = "";
+				result['dept_hour'] = "";
+				result['arrv_hour'] = "";
+				result['dept_minute'] = "";
+				result['arrv_minute'] = "";
+
 			}
 		}
 		else {
@@ -159,6 +176,24 @@ module.exports = {
 
 		callback(result);
 	}//end of make_train_contents
+
+	,check_transfer : function( target_station, callback ) {
+		var flag = 0;
+		for ( var i=0; i < transfer_station.length; i++ ) {
+			(function(m) {
+				if( transfer_station[m] == target_station ) {
+					console.log('true', m, target_station);
+					flag++;
+					callback(true);
+				}
+				else if ( (transfer_station[m] != target_station) && (m == transfer_station.length-1) && (flag==0) ) {
+					console.log('false', m, target_station);
+					callback(false);
+				}
+			})(i);
+
+		}
+	} // end of check_transfer
 
 
 /******************************* 
@@ -182,7 +217,7 @@ module.exports = {
 								for( var j=0; j<arrv_stations.length; j++ ) {
 									(function(n) {
 										//To do
-										self.get_time_table_station( dept_stations[m], arrv_stations[n], function(result){
+										self.get_time_table_station( dept_stations[m], arrv_stations[n], 0, 0, function(result){
 											if( (result != false) && (result.length > 0) ){
 												var k = time_table.length;
 												time_table[k] = {};
@@ -212,7 +247,7 @@ module.exports = {
 	,show_time_table_station : function( req, res) {
 		var self = this;
 		var time_table = {};
-		self.get_time_table_station( req.body.dept_station, req.body.arrv_station, function( result ) {
+		self.get_time_table_station( req.body.dept_station, req.body.arrv_station, 0, 0, function( result ) {
 
 			if( (result != false) && (result.length > 0) ){
 				time_table['dept_station'] = req.body.dept_station;
@@ -223,8 +258,8 @@ module.exports = {
 			}
 			//직통 경로가 없을 때
 			else{
-				self.get_transfer_time_table( req.body.dept_station, req.body.arrv_station, function( result ) { 
-					console.log('result :', result);
+				self.get_transfer_time_table( req.body.dept_station, req.body.arrv_station, 0, function( result ) {
+					console.log( "7) callback?! result : ", result);
 					res.json(result);
 				});
 			}
@@ -233,97 +268,192 @@ module.exports = {
 		});//end of get_time_table_station
 	}// end of show_time_table_station
 	
-	,get_time_table_station : function( dept_station, arrv_station, callback ) {
+	,get_time_table_station : function( dept_station, arrv_station, dept_hour, dept_minute, callback ) {
 		var self = this;
 		var condition = { 'dept_station' : dept_station };
-		var order_target = 'dept_time';
+		var order_target = 'dept_hour';
 		var time_table = new Array();
-
-		time_table_db.get_list(condition, order_target, function(result) {
+		time_table_db.get_list(condition, order_target, dept_hour, function(result) {
+			console.log("result.result", result.result, result.data.length);
 			if(result.result == true) {
 				var list = result.data;
 
 				for( var i=0; i < list.length; i++ ) {
 					(function(m){
 						condition = { 'id' : list[m].id, 'arrv_station' : arrv_station };
-						order_target = '-arrv_time';
 
-						time_table_db.get_one(condition, function(result){
+						time_table_db.get_one(condition, dept_hour, dept_minute, function(result){
 							if( result.result == true) {
-								self.compare_time(list[m].dept_time, result.data.arrv_time, function(compare_result) {
+								// To Modify
+								self.compare_time(list[m].dept_hour, list[m].dept_minute, result.data.arrv_hour,result.data.arrv_minute , function(compare_result) {
 									if( compare_result == true) {
-										var j = time_table.length
+										var j = time_table.length;
 										time_table[j] = {};
 										time_table[j]['id'] = list[m].id;
-										time_table[j]['dept_time'] = list[m].dept_time;
-										time_table[j]['arrv_time'] = result.data.arrv_time;
+										time_table[j]['dept_hour'] = list[m].dept_hour;
+										time_table[j]['arrv_hour'] = result.data.arrv_hour;
+										time_table[j]['dept_minute'] = list[m].dept_minute;
+										time_table[j]['arrv_minute'] = result.data.arrv_minute;
 										time_table[j]['type'] = result.data.type;	
 									}									
 								});
 							}
 
-							if( m == list.length-1 ) {
+							if( m == list.length-1) {
+								console.log( 'callback');
 								callback(time_table);
 							}	
 						});
 
 					})(i);
 				}
+
+				if( list.length == 0 ) {
+					callback(false);
+				}
 			}
 			else {
+				console.log( 'callback2');
 				callback(false);
 			}
 		});
 	}// end of get_time_table_station
 
 	//환승 한 번 ! 인 경우만. 두번 이상도 있으려나?
-	,get_transfer_time_table : function( dept_station, arrv_station, callback ) {
+	/*	
+		[
+			{
+				departure {
+					station,
+					dept_time,
+					type,
+					id
+				}.
+
+				transfer {
+					station,
+					arrv_time,
+					dept_time,
+					type,
+					id
+				},
+
+				arrival {
+					station,
+					arrv_time
+				}
+			},
+			...
+		]
+	*/
+	,get_transfer_time_table : function( dept_station, arrv_station, dept_hour, callback ) {
+	
 		var self = this;
 		var time_table = new Array();
-		var prev_time_table = new Array();
-		var post_time_table = new Array();
-		for( var i = 0; i < transfer_station.length; i++) {
-			(function(m){
-				self.get_time_table_station(dept_station, transfer_station[m], function(prev_result) {
-					prev_time_table[m] = {};
-					prev_time_table[m]['dept_station'] = dept_station;
-					prev_time_table[m]['arrv_station'] = transfer_station[m];
-					prev_time_table[m]['time_table'] = new Array();
-					prev_time_table[m]['time_table'] = prev_result;
+		var count = 0;
+		var condition = {};
+		var order_target = 'dept_hour';
 
-					self.get_time_table_station( transfer_station[m], arrv_station, function(post_result) {
-						post_time_table[m] = {};
-						post_time_table[m]['dept_station'] = transfer_station[m];
-						post_time_table[m]['arrv_station'] = arrv_station;
-						post_time_table[m]['time_table'] = new Array();
-						post_time_table[m]['time_table'] = post_result;	
+		//1. 출발역에서 출발하는 모든 열차의 종류를 획득한다.
+		condition = { 'dept_station' : dept_station };
+		dept_hour = dept_hour || 0;
 
-						time_table[m] = {};
-						time_table[m]['prev'] = new Array();
-						time_table[m]['post'] = new Array();
-						time_table[m]['prev'] = prev_time_table[m];
-						time_table[m]['post'] = post_time_table[m];
+		time_table_db.get_list(condition, order_target, dept_hour, function(train) {
+			//2. 열차가 존재할 경우 그 열차 내에서 환승역이 존재하는지 검사한다.
+			if(train.result == true ) {
+				
+				function iter1(m) {
+					if( m < train.data.length) {
+						condition = { 'id' : train.data[m].id, 'is_transfer' : true };
+						
+						time_table_db.get_list(condition, order_target, train.data[m].arrv_hour, function(transfer){
+							//3. 환승역이 존재한다면, 존재하는 환승역 숫자만큼 해당 환승역에서 목적지까지의 직통노선을 조회한다.
+							// +) 시간을 비교해서 해당 시간대만 뽑아오는 과정이 필요.
+							// ++) 그러려면 디비의 저장되는 방식을 바꿔야한다.
+							if(transfer.result == true) {
+								
+								function iter2(n){
+									if( n < transfer.data.length ) {
+										self.get_time_table_station( transfer.data[n].arrv_station, 
+																	arrv_station, 
+																	transfer.data[n].arrv_hour, 
+																	transfer.data[n].arrv_minute, 
+										function( transfer_train ){
+											if( transfer_train.length > 0 ) {
+												function iter3(l) {
+													console.log("l : ", l);
+													if(l < transfer_train.length) {
+														var len = time_table.length;
+														time_table[len] = {};
+														time_table[len]['departure'] = {
+															'station'		: dept_station,
+															'dept_hour' 	: train.data[m].dept_hour,
+															'dept_minute' 	: train.data[m].dept_minute,
+															'id'			: train.data[m].id,
+															'type'			: train.data[m].type
+														};
 
-						console.log('time table : ', time_table)
+														time_table[len]['transfer'] = {
+															'station'		: transfer.data[n].arrv_station,
+															'arrv_hour'		: transfer.data[n].arrv_hour,
+															'arrv_minute'	: transfer.data[n].arrv_minute,
+															'dept_hour'		: transfer_train[l].dept_hour,
+															'dept_minute'	: transfer_train[l].dept_minute,
+															'id'			: transfer_train[l].id,
+															'type'			: transfer_train[l].type
+														};
 
-						if ( m == transfer_station.length-1 ) {
-							console.log('here', time_table);
-							callback(time_table);
-						}
-					});						
-				});
-			})(i);
-		}
-	}//end of get_transfer_time_table
+														time_table[len]['arrival'] = {
+															'station'		: arrv_station,
+															'arrv_hour'		: transfer_train[l].arrv_hour,
+															'arrv_minute'	: transfer_train[l].arrv_minute
+														};
 
-	,compare_time : function(time1, time2, callback) {
-		var early = time1.split(':');
-		var late = time2.split(':');
-		if( time1 != "" && time2 != "") {
-			if( parseInt(early[0], 10) > parseInt(late[0], 10) ) {
+														iter3(l+1);
+													}//end of if
+													else {
+														iter2(n+1);
+													}
+												}//end of iter3
+												iter3(0);
+	
+											}//end of if
+											else {
+												iter2(n+1);
+											}
+											
+										})//end of get_time_table_station
+									} //end of if
+									else {
+										iter1(m+1);
+									}
+								}//end of iter2
+								iter2(0);
+
+							}//end of if
+							else {
+								iter1(m+1);
+							}
+						});//end of get_list
+					}//end of if
+					else {
+						callback(time_table);
+					}
+				}//end of iter1
+				iter1(0);
+			}//end of if
+			else {
 				callback(false);
 			}
-			else if( parseInt(early[1], 10) > parseInt(late[1], 10) ) {
+		});//end of get_list
+	}//end of get_transfer_time_table
+
+	,compare_time : function(hour1, minute1, hour2, minute2, callback) {
+		if( hour1 != "" && hour2 != "" && minute1 != "" && minute2 != "") {
+			if( hour1 > hour2 ) {
+				callback(false);
+			}
+			else if( ( hour1 == hour2 ) &&  ( minute1 > minute2 )  ) {
 				callback(false);
 			}
 			else {

@@ -13,7 +13,7 @@ var app = express();
 var api = require('./routes/api')
   , render = require('./routes/render');
 
-mongoose.connect(process.env.MONGOHQ_URL || 'mongodb://localhost/t3');
+mongoose.connect(process.env.MONGOHQ_URL || 'mongodb://localhost/t3_3');
 
 app.configure(function(){
   app.set('port', process.env.PORT || 51200);

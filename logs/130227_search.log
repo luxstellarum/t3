@@ -1,0 +1,309 @@
+Express server listening on port 51200
+result.result true 188
+callback
+[90mPOST /show_time_table/station [32m200 [90m617ms - 2.62kb[0m
+result.result true 16
+callback
+result.result true 46
+callback
+result.result true 45
+callback
+result.result true 1
+callback
+result.result true 0
+result.result true 24
+callback
+result.result true 41
+callback
+l :  0
+l :  1
+l :  2
+l :  3
+result.result true 46
+callback
+result.result true 22
+callback
+result.result true 35
+callback
+l :  0
+l :  1
+l :  2
+l :  3
+result.result true 30
+callback
+l :  0
+l :  1
+l :  2
+result.result true 21
+callback
+result.result true 10
+callback
+l :  0
+l :  1
+l :  2
+result.result true 12
+callback
+l :  0
+l :  1
+l :  2
+result.result true 142
+callback
+result.result true 25
+callback
+result.result true 21
+callback
+result.result true 23
+callback
+result.result true 16
+callback
+result.result true 23
+callback
+l :  0
+l :  1
+result.result true 4
+callback
+result.result true 5
+callback
+result.result true 7
+callback
+result.result true 14
+callback
+result.result true 19
+callback
+l :  0
+l :  1
+result.result true 10
+callback
+result.result true 14
+callback
+result.result true 7
+callback
+result.result true 11
+callback
+result.result true 15
+callback
+result.result true 10
+callback
+result.result true 5
+callback
+result.result true 1
+callback
+result.result true 1
+callback
+result.result true 5
+callback
+result.result true 5
+callback
+result.result true 17
+callback
+7) callback?! result :  [ { departure: 
+     { station: '안동',
+       dept_hour: 2,
+       dept_minute: 18,
+       id: '1624',
+       type: '무궁화' },
+    transfer: 
+     { station: '제천',
+       arrv_hour: 3,
+       arrv_minute: 48,
+       dept_hour: 9,
+       dept_minute: 21,
+       id: '1631',
+       type: '무궁화' },
+    arrival: { station: '태백', arrv_hour: 11, arrv_minute: 8 } },
+  { departure: 
+     { station: '안동',
+       dept_hour: 2,
+       dept_minute: 18,
+       id: '1624',
+       type: '무궁화' },
+    transfer: 
+     { station: '제천',
+       arrv_hour: 3,
+       arrv_minute: 48,
+       dept_hour: 11,
+       dept_minute: 4,
+       id: '1633',
+       type: '무궁화' },
+    arrival: { station: '태백', arrv_hour: 12, arrv_minute: 50 } },
+  { departure: 
+     { station: '안동',
+       dept_hour: 2,
+       dept_minute: 18,
+       id: '1624',
+       type: '무궁화' },
+    transfer: 
+     { station: '제천',
+       arrv_hour: 3,
+       arrv_minute: 48,
+       dept_hour: 15,
+       dept_minute: 57,
+       id: '1637',
+       type: '무궁화' },
+    arrival: { station: '태백', arrv_hour: 17, arrv_minute: 42 } },
+  { departure: 
+     { station: '안동',
+       dept_hour: 7,
+       dept_minute: 5,
+       id: '1602',
+       type: '무궁화' },
+    transfer: 
+     { station: '제천',
+       arrv_hour: 8,
+       arrv_minute: 41,
+       dept_hour: 9,
+       dept_minute: 21,
+       id: '1631',
+       type: '무궁화' },
+    arrival: { station: '태백', arrv_hour: 11, arrv_minute: 8 } },
+  { departure: 
+     { station: '안동',
+       dept_hour: 7,
+       dept_minute: 5,
+       id: '1602',
+       type: '무궁화' },
+    transfer: 
+     { station: '제천',
+       arrv_hour: 8,
+       arrv_minute: 41,
+       dept_hour: 11,
+       dept_minute: 4,
+       id: '1633',
+       type: '무궁화' },
+    arrival: { station: '태백', arrv_hour: 12, arrv_minute: 50 } },
+  { departure: 
+     { station: '안동',
+       dept_hour: 7,
+       dept_minute: 5,
+       id: '1602',
+       type: '무궁화' },
+    transfer: 
+     { station: '제천',
+       arrv_hour: 8,
+       arrv_minute: 41,
+       dept_hour: 15,
+       dept_minute: 57,
+       id: '1637',
+       type: '무궁화' },
+    arrival: { station: '태백', arrv_hour: 17, arrv_minute: 42 } },
+  { departure: 
+     { station: '안동',
+       dept_hour: 8,
+       dept_minute: 30,
+       id: '1072',
+       type: '새마을' },
+    transfer: 
+     { station: '제천',
+       arrv_hour: 10,
+       arrv_minute: 3,
+       dept_hour: 11,
+       dept_minute: 4,
+       id: '1633',
+       type: '무궁화' },
+    arrival: { station: '태백', arrv_hour: 12, arrv_minute: 50 } },
+  { departure: 
+     { station: '안동',
+       dept_hour: 8,
+       dept_minute: 30,
+       id: '1072',
+       type: '새마을' },
+    transfer: 
+     { station: '제천',
+       arrv_hour: 10,
+       arrv_minute: 3,
+       dept_hour: 15,
+       dept_minute: 57,
+       id: '1637',
+       type: '무궁화' },
+    arrival: { station: '태백', arrv_hour: 17, arrv_minute: 42 } },
+  { departure: 
+     { station: '안동',
+       dept_hour: 8,
+       dept_minute: 10,
+       id: '1672',
+       type: '무궁화' },
+    transfer: 
+     { station: '동백산',
+       arrv_hour: 10,
+       arrv_minute: 42,
+       dept_hour: 11,
+       dept_minute: 53,
+       id: '1638',
+       type: '무궁화' },
+    arrival: { station: '태백', arrv_hour: 12, arrv_minute: 3 } },
+  { departure: 
+     { station: '안동',
+       dept_hour: 8,
+       dept_minute: 10,
+       id: '1672',
+       type: '무궁화' },
+    transfer: 
+     { station: '동백산',
+       arrv_hour: 10,
+       arrv_minute: 42,
+       dept_hour: 16,
+       dept_minute: 28,
+       id: '1640',
+       type: '무궁화' },
+    arrival: { station: '태백', arrv_hour: 16, arrv_minute: 38 } },
+  { departure: 
+     { station: '안동',
+       dept_hour: 8,
+       dept_minute: 10,
+       id: '1672',
+       type: '무궁화' },
+    transfer: 
+     { station: '동해',
+       arrv_hour: 11,
+       arrv_minute: 44,
+       dept_hour: 15,
+       dept_minute: 28,
+       id: '1640',
+       type: '무궁화' },
+    arrival: { station: '태백', arrv_hour: 16, arrv_minute: 38 } },
+  { departure: 
+     { station: '안동',
+       dept_hour: 8,
+       dept_minute: 10,
+       id: '1672',
+       type: '무궁화' },
+    transfer: 
+     { station: '동해',
+       arrv_hour: 11,
+       arrv_minute: 44,
+       dept_hour: 17,
+       dept_minute: 10,
+       id: '1642',
+       type: '무궁화' },
+    arrival: { station: '태백', arrv_hour: 18, arrv_minute: 22 } },
+  { departure: 
+     { station: '안동',
+       dept_hour: 11,
+       dept_minute: 15,
+       id: '1622',
+       type: '무궁화' },
+    transfer: 
+     { station: '제천',
+       arrv_hour: 12,
+       arrv_minute: 51,
+       dept_hour: 15,
+       dept_minute: 57,
+       id: '1637',
+       type: '무궁화' },
+    arrival: { station: '태백', arrv_hour: 17, arrv_minute: 42 } },
+  { departure: 
+     { station: '안동',
+       dept_hour: 13,
+       dept_minute: 20,
+       id: '1604',
+       type: '무궁화' },
+    transfer: 
+     { station: '제천',
+       arrv_hour: 14,
+       arrv_minute: 53,
+       dept_hour: 15,
+       dept_minute: 57,
+       id: '1637',
+       type: '무궁화' },
+    arrival: { station: '태백', arrv_hour: 17, arrv_minute: 42 } } ]
+[90mPOST /show_time_table/station [32m200 [90m2701ms - 6.09kb[0m
